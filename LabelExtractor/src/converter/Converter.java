@@ -52,9 +52,11 @@ public class Converter {
 		}
 
 		System.out.println("************** LISTA FILE ***********************");
+
 		for (File pdf : pdfFiles) {
 			System.out.println(pdf.getName());
 		}
+
 		System.out.println("*************************************************");
 		String outPath = path + File.separator + "convertiti";
 		System.out.println("I file PDF in ingresso verranno convertiti nella directory " + outPath);
@@ -89,11 +91,14 @@ public class Converter {
 	private static void extractImagesAndCreateTempFiles(final String sourceFile, final String outPath)
 			throws IOException {
 		PdfDocument pdfDoc = new PdfDocument(new PdfReader(sourceFile));
-		IEventListener listener = new MyImageRenderListener(outPath);
+		MyImageRenderListener myListener = new MyImageRenderListener(outPath);
+		IEventListener listener = myListener;
 		PdfCanvasProcessor parser = new PdfCanvasProcessor(listener);
+		System.out.println(pdfDoc.getNumberOfPages()+ " pagine da processare nel file "+sourceFile);
 		for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
 			parser.processPageContent(pdfDoc.getPage(i));
 		}
+		myListener.cleanUp();
 		pdfDoc.close();
 		mergeFiles(new File(sourceFile).getName(), outPath);
 	}
@@ -108,8 +113,8 @@ public class Converter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//clean-up
+
+		// clean-up
 		{
 			File dest = new File(destFile);
 			if (dest.exists()) {
