@@ -79,7 +79,7 @@ public class MyImageRenderListener implements IEventListener {
 				fos.write(imageByte);
 				fos.close();
 				File resized = processImage(tempFile);
-				System.out.println("Immagine temporanea salvata in " + tempFile.getAbsolutePath());
+				Logger.print("Immagine temporanea salvata in " + tempFile.getAbsolutePath());
 
 				byte[] resizedBytes = new byte[(int) resized.length()];
 				FileInputStream fis = new FileInputStream(resized);
@@ -88,7 +88,7 @@ public class MyImageRenderListener implements IEventListener {
 				imageQueue.add(ImageDataFactory.createPng(resizedBytes));
 
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				Logger.print(e.getMessage());
 			}
 			break;
 		default: {
@@ -108,12 +108,12 @@ public class MyImageRenderListener implements IEventListener {
 					}
 				}
 			} else if (startText) {
-				System.out.println("Finito di leggere i testi.");
-				System.out.println("Testo dopo l'immagine:");
-				System.out.println(sb.toString());
+				Logger.print("Finito di leggere i testi.");
+				Logger.print("Testo dopo l'immagine:");
+				Logger.print(sb.toString());
 				String filename = path + "\\" + labelNo + ".pdf";
 				labelNo++;
-				System.out.println("Etichetta temporanea verra' creata sul file " + filename);
+				Logger.print("Etichetta temporanea verra' creata sul file " + filename);
 				addImageAndText(imageQueue.poll(), sb.toString(), filename);
 				resetSkipLogic();
 				break;
@@ -221,7 +221,7 @@ public class MyImageRenderListener implements IEventListener {
 			// Closing the document
 			document.close();
 
-			System.out.println("Table added");
+			//Logger.print("Table added");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -234,12 +234,15 @@ public class MyImageRenderListener implements IEventListener {
 
 
 	public void cleanUp() {
-		System.out.println("Testo dopo l'immagine:");
-		System.out.println(sb.toString());
+		//Logger.print("Testo dopo l'immagine:");
+		//Logger.print(sb.toString());
 		String filename = path + "\\" + labelNo + ".pdf";
-		System.out.println("Etichetta temporanea verra' creata sul file " + filename);
-		addImageAndText(imageQueue.poll(), sb.toString(), filename);
+		//Logger.print("Etichetta temporanea verra' creata sul file " + filename);
+		ImageData imgD = imageQueue.poll();
+		if (imgD != null) {
+			addImageAndText(imageQueue.poll(), sb.toString(), filename);
+		}
 		resetSkipLogic();
-		System.out.println("Lettura PDF completata");
+		//Logger.print("Lettura PDF completata");
 	}
 }

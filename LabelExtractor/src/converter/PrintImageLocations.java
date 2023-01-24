@@ -74,6 +74,8 @@ public class PrintImageLocations extends PDFStreamEngine
      */
     public static void main( String[] args ) throws IOException
     {
+    	
+    	
         if( args.length != 1 )
         {
             usage();
@@ -87,7 +89,7 @@ public class PrintImageLocations extends PDFStreamEngine
                 for( PDPage page : document.getPages() )
                 {
                     pageNum++;
-                    System.out.println( "Processing page: " + pageNum );
+                    Logger.print( "Processing page: " + pageNum );
                     printer.processPage(page);
                 }
             }
@@ -118,28 +120,28 @@ public class PrintImageLocations extends PDFStreamEngine
                 PDImageXObject image = (PDImageXObject)xobject;
                 int imageWidth = image.getWidth();
                 int imageHeight = image.getHeight();
-                System.out.println("*******************************************************************");
-                System.out.println("Found image [" + objectName.getName() + "]");
+                Logger.print("*******************************************************************");
+                Logger.print("Found image [" + objectName.getName() + "]");
         
                 Matrix ctmNew = getGraphicsState().getCurrentTransformationMatrix();
                 float imageXScale = ctmNew.getScalingFactorX();
                 float imageYScale = ctmNew.getScalingFactorY();
 
                 // position in user space units. 1 unit = 1/72 inch at 72 dpi
-                System.out.println("position in PDF = " + ctmNew.getTranslateX() + ", " + ctmNew.getTranslateY() + " in user space units");
+                Logger.print("position in PDF = " + ctmNew.getTranslateX() + ", " + ctmNew.getTranslateY() + " in user space units");
                 // raw size in pixels
-                System.out.println("raw image size  = " + imageWidth + ", " + imageHeight + " in pixels");
+                Logger.print("raw image size  = " + imageWidth + ", " + imageHeight + " in pixels");
                 // displayed size in user space units
-                System.out.println("displayed size  = " + imageXScale + ", " + imageYScale + " in user space units");
+                Logger.print("displayed size  = " + imageXScale + ", " + imageYScale + " in user space units");
                 // displayed size in inches at 72 dpi rendering
                 imageXScale /= 72;
                 imageYScale /= 72;
-                System.out.println("displayed size  = " + imageXScale + ", " + imageYScale + " in inches at 72 dpi rendering");
+                Logger.print("displayed size  = " + imageXScale + ", " + imageYScale + " in inches at 72 dpi rendering");
                 // displayed size in millimeters at 72 dpi rendering
                 imageXScale *= 25.4;
                 imageYScale *= 25.4;
-                System.out.println("displayed size  = " + imageXScale + ", " + imageYScale + " in millimeters at 72 dpi rendering");
-                System.out.println();
+                Logger.print("displayed size  = " + imageXScale + ", " + imageYScale + " in millimeters at 72 dpi rendering");
+                Logger.print();
                 images.add(image);
             }
             else if(xobject instanceof PDFormXObject)
