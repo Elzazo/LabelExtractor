@@ -23,6 +23,8 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.IEventListener;
  */
 public class Converter {
 
+	
+	private static boolean debug = false;
 	/**
 	 * @param args
 	 * @throws InterruptedException 
@@ -90,7 +92,7 @@ public class Converter {
 		for (File pdfFile : pdfFiles) {
 			try {
 				extractImagesAndCreateTempFiles(pdfFile.getAbsolutePath(), outPath);
-				Logger.print("File " + pdfFile + " elaborato.");
+				Logger.print("Il file " + pdfFile + " elaborato, sara' spostato nella cartella 'elaborati'.");
 				createElaboratiDir(path+"/elaborati/");
 				File moved = new File (path+"/elaborati/"+pdfFile.getName());
 				if (moved.exists()) {
@@ -116,7 +118,7 @@ public class Converter {
 		Logger.print();
 		Logger.print();
 		Logger.print("==============================================");	
-		Logger.print("========== Convertitore etichette GeCo =======");
+		Logger.print("========== Convertitore etichette Init =======");
 		Logger.print("=============== T.A.R SARDEGNA ===============");
 		Logger.print("===========Aldo Lezza a.lezza@giaum.it========");
 		Logger.print("==============================================");
@@ -132,8 +134,15 @@ public class Converter {
 		IEventListener listener = myListener;
 		PdfCanvasProcessor parser = new PdfCanvasProcessor(listener);
 		Logger.print(pdfDoc.getNumberOfPages()+ " pagine da processare nel file "+sourceFile);
-		for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
-			parser.processPageContent(pdfDoc.getPage(i));
+		final int pagesToProcess = debug ? 1 :pdfDoc.getNumberOfPages();
+		Logger.print("Estrazione delle etichette in corso, attendere...");
+		for (int i = 1; i <= pagesToProcess; i++) {
+			try {
+				parser.processPageContent(pdfDoc.getPage(i));
+			}catch (Exception e){
+				Logger.print(e.getMessage());
+				Logger.printExceptionToLogOnly(e);
+			}
 		}
 		myListener.cleanUp();
 		pdfDoc.close();
@@ -147,8 +156,8 @@ public class Converter {
 		try {
 			writer = new PdfWriter(destFile);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.print(e.getMessage());
+			Logger.printExceptionToLogOnly(e);
 		}
 
 		// clean-up
@@ -187,23 +196,32 @@ public class Converter {
 		// Creating a PdfDocument
 		PdfDocument pdf = new PdfDocument(writer);
 
-		Logger.print("Riunisco i file...");
+		Logger.printToLog("Riunisco i file...");
+		Logger.print("Trovate "+tempFiles.length+ " etichette, creazione del file delle etichette in corso...");
 		for (File temp : tempFiles) {
 			try {
+				temp.deleteOnExit();
 				PdfReader reader = new PdfReader(temp);
-				Logger.print("File " + temp.getName());
+				Logger.printToLog("File " + temp.getName());
 				PdfDocument document = new PdfDocument(reader);
 				document.copyPagesTo(1, document.getNumberOfPages(), pdf);
 				document.close();
 				reader.close();
-				temp.deleteOnExit();
+				
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger.print(e.getMessage());
+				Logger.printExceptionToLogOnly(e);
 			}
 		}
-
-		pdf.close();
+		try {
+			pdf.close();
+			Logger.print("Il file delle etichette si trova nel percorso "+destFile);
+		}catch (Exception e) {
+			Logger.print("Impossibile salvare il file con le etichette");
+			Logger.print(e.getMessage());
+			Logger.printExceptionToLogOnly(e);
+		}
+		
 	}
 
 }

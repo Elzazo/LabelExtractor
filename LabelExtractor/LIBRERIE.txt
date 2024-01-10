@@ -1,0 +1,3 @@
+Importare le 6 librerie della cartella lib come "User Library" del progetto Eclipse per compilare ed eseguire.
+Piazzare un file .pdf con le etichette Init per testare l'applicazione.
+Il log avrà come nome file l'hostname della macchina di esecuzione.

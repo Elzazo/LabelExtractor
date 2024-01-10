@@ -1,0 +1,1 @@
+Creare il JAR come Runnable e salvare il build.xml nella cartella del progetto
